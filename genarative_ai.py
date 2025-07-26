@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify,render_template
 from werkzeug.utils import secure_filename
 from PIL import Image  # Added for image processing
 # Your API key directly assigned
-api_key_value = '***'
+api_key_value = "'***"
 key="***"
 model_name = 'gemini-2.0-flash' # Using a different variable name to avoid conflict
 
