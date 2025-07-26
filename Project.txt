@@ -1,0 +1,108 @@
+🔍 What QFileDialog.getOpenFileName() returns:
+It returns a tuple like this:
+
+file_path,_=QFileDialog.getOpenFileName(self, "Open PDF File", "",
+                                                   "Supported Files (*.pdf *.png *.jpg *.jpeg);;PDF Files (*.pdf);;Image Files (*.png *.jpg *.jpeg)")    
+
+("C:/Users/.../example.pdf", "PDF Files (*.pdf)")
+file_path: The full path of the selected file.
+
+_ (the second value): The selected filter, e.g. "PDF Files (*.pdf)".
+
+
+def atteched_clicked(self):
+        # print("Fi")
+        file_path=QFileDialog.getOpenFileName(self, "Open PDF File", "",
+                                                   "Supported Files (*.pdf *.png *.jpg *.jpeg);;PDF Files (*.pdf);;Image Files (*.png *.jpg *.jpeg)")    
+        if file_path:
+            extension=os.path.splitext(file_path[0])[1].lower()
+            print(extension)
+            if extension == 'pdf':
+                with open(file_path,'r') as f:
+                    file_text=f.read()
+                    print(file_text)
+
+
+
+is this able to open a pdf and print the pdf contain?
+
+
+ChatGPT said:
+Your current code has two main issues:
+
+❌ Issues:
+Incorrect extension comparison:
+
+python
+Copy
+Edit
+if extension == 'pdf':
+This will never be True because os.path.splitext() returns the extension with a dot, like .pdf.
+
+✅ Correct it to:
+
+python
+Copy
+Edit
+if extension == '.pdf':
+Incorrect way of opening a PDF file:
+
+python
+Copy
+Edit
+with open(file_path, 'r') as f:
+This treats the PDF like a plain text file — but PDFs are binary and structured, not readable as plain text. You’ll get either:
+
+Garbage output
+
+Or an error like UnicodeDecodeError
+
+✅ Correct way to read and print PDF text
+Use a PDF library like PyMuPDF (recommended) or PyPDF2.
+
+Example using PyMuPDF (fitz):
+First, install it:
+
+bash
+Copy
+Edit
+pip install pymupdf
+Then:
+
+python
+Copy
+Edit
+import os
+import fitz  # PyMuPDF
+from PyQt5.QtWidgets import QFileDialog
+
+def atteched_clicked(self):
+    file_path, _ = QFileDialog.getOpenFileName(
+        self, "Open PDF or Image", "",
+        "Supported Files (*.pdf *.png *.jpg *.jpeg);;PDF Files (*.pdf);;Image Files (*.png *.jpg *.jpeg)"
+    )
+
+    if file_path:
+        extension = os.path.splitext(file_path)[1].lower()
+        print("Selected file extension:", extension)
+
+        if extension == '.pdf':
+            doc = fitz.open(file_path)
+            text = ""
+            for page in doc:
+                text += page.get_text()
+            print("PDF Content:\n", text)
+            doc.close()
+
+        elif extension in ['.png', '.jpg', '.jpeg']:
+            print("Selected image:", file_path)
+            # You can now show the image using QLabel or process it
+Let me know if you want to extract text from an image (OCR) or display the selected image in your PyQt app!
+
+
+
+
+
+
+
+
